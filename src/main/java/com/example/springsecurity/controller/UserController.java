@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.springsecurity.entity.ERole;
 import com.example.springsecurity.entity.Role;
 import com.example.springsecurity.entity.User;
+import com.example.springsecurity.exception.LogicException;
 import com.example.springsecurity.payload.RoleToUserRequest;
 import com.example.springsecurity.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,9 +44,7 @@ public class UserController {
     }
 
     @PostMapping("/user/save")
-    public ResponseEntity<User> saveUser(@RequestBody User user){
-        String a = "â";
-
+    public ResponseEntity<User> saveUser(@RequestBody User user) throws LogicException {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveUser(user));
     }

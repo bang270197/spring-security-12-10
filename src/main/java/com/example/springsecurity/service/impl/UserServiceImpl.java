@@ -3,6 +3,8 @@ package com.example.springsecurity.service.impl;
 import com.example.springsecurity.entity.ERole;
 import com.example.springsecurity.entity.Role;
 import com.example.springsecurity.entity.User;
+import com.example.springsecurity.exception.ErrorCode;
+import com.example.springsecurity.exception.LogicException;
 import com.example.springsecurity.repo.RoleRepo;
 import com.example.springsecurity.repo.UserRepo;
 import com.example.springsecurity.service.UserService;
@@ -18,6 +20,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 
 @Transactional
@@ -43,6 +46,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if(user == null){
             log.info("User not found in the database");
             throw  new UsernameNotFoundException("User not found in the database");
+
+//            throw  new LogicException(ErrorCode.FORBIDDEN);
         }else {
             log.info("User found in the database: {}",userName);
         }
@@ -54,8 +59,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User saveUser(User user) {
+    public User saveUser(User user) throws LogicException {
         log.info("Saving new user to the database");
+        Optional<User> user1 = userRepo.findById(user.getId());
+        if (user1.isPresent()){
+            throw new LogicException(ErrorCode.BAD_REQUEST);
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
